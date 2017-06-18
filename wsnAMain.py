@@ -117,6 +117,7 @@ class Ui_Dialog(QtGui.QWidget):
 
         # a figure instance to plot on
         self.figure = plt.figure()
+	
 
         # this is the Canvas Widget that displays the `figure`
         # it takes the `figure` instance as a parameter to __init__
@@ -237,7 +238,7 @@ class AboutWindow(QtGui.QWidget):
         self.label.setTextFormat(QtCore.Qt.PlainText)
         self.label.setObjectName(_fromUtf8("label"))
         self.widget = QtGui.QWidget(Form)
-        self.widget.setGeometry(QtCore.QRect(90, 80, 65, 65))
+        self.widget.setGeometry(QtCore.QRect(90, 80, 64, 65))
         self.widget.setStyleSheet(_fromUtf8("background-image: url(/media/tete/F/TinyOS/wsnA/logo.png);"))
         self.widget.setObjectName(_fromUtf8("widget"))
         self.label_2 = QtGui.QLabel(Form)
