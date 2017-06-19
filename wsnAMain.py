@@ -143,7 +143,12 @@ class Ui_Dialog(QtGui.QWidget):
     def add_logcallsfile(self):
         ''' Add logcalls and put it's path on the GUI.
         '''
-        self.logcallsfile_path[len(self.logcallsfile_path)+1] = QtGui.QFileDialog.getOpenFileName(self, 'add logcalls file', '/')
+        file_path = QtGui.QFileDialog.getOpenFileName(self, 'add logcalls file', '/')
+        if len(file_path) == 0:
+            return
+
+        self.logcallsfile_path[len(self.logcallsfile_path)+1] = file_path
+        
         self.textBro_logcalls.setText('[Notice]:\nmust be a file containing logcalls.\n')
         for e in self.logcallsfile_path.keys():
             self.textBro_logcalls.append('[' + str(e)  +'] ' + self.logcallsfile_path[e])
