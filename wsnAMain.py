@@ -17,6 +17,7 @@ import matplotlib.backends.backend_qt5agg
 import math
 import numpy as np
 import sys
+from TaskWatch import NodeLogcalls
 
 
 try:
@@ -33,13 +34,21 @@ except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
 
+
+
+def print_log(types = 'INFO', msg = None):
+    all_types = {'warning':'WARNING', 'err':'ERROR', 'info':'INFO'}
+    colors = {'warning':'\033[1;32m', 'err':'\033[1;31m', 'info':'\033[0m', 'default':'\033[0m'}
+    print colors[types] + '[' + all_types[types] + ']:\t' + colors['default'] + msg
+
+    
 class Ui_Dialog(QtGui.QWidget):
     def setupUi(self, Dialog):
         Dialog.setObjectName(_fromUtf8("Dialog"))
         Dialog.resize(769, 567)
         self.scrollArea = QtGui.QScrollArea(Dialog)
         self.scrollArea.setGeometry(QtCore.QRect(0, -10, 75, 581))
-        self.scrollArea.setStyleSheet(_fromUtf8("background-image: url(/media/tete/F/TinyOS/wsnA/main.jpg);"))
+        self.scrollArea.setStyleSheet(_fromUtf8("background-image: url(/media/tete/F/TinyOS/wsnA/resource/main.jpg);"))
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName(_fromUtf8("scrollArea"))
         self.scrollAreaWidgetContents = QtGui.QWidget()
@@ -47,28 +56,28 @@ class Ui_Dialog(QtGui.QWidget):
         self.scrollAreaWidgetContents.setObjectName(_fromUtf8("scrollAreaWidgetContents"))
         self.pushButton_addfile = QtGui.QPushButton(self.scrollAreaWidgetContents)
         self.pushButton_addfile.setGeometry(QtCore.QRect(20, 50, 31, 31))
-        self.pushButton_addfile.setStyleSheet(_fromUtf8("background-image: url(/media/tete/F/TinyOS/wsnA/add.png);"))
+        self.pushButton_addfile.setStyleSheet(_fromUtf8("background-image: url(/media/tete/F/TinyOS/wsnA/resource/add.png);"))
         self.pushButton_addfile.setText(_fromUtf8(""))
         self.pushButton_addfile.setObjectName(_fromUtf8("pushButton"))
 
         self.pushButton_start = QtGui.QPushButton(self.scrollAreaWidgetContents)
         self.pushButton_start.setGeometry(QtCore.QRect(20, 120, 31, 31))
-        self.pushButton_start.setStyleSheet(_fromUtf8("background-image: url(/media/tete/F/TinyOS/wsnA/start.png);"))
+        self.pushButton_start.setStyleSheet(_fromUtf8("background-image: url(/media/tete/F/TinyOS/wsnA/resource/start.png);"))
         self.pushButton_start.setText(_fromUtf8(""))
         self.pushButton_start.setObjectName(_fromUtf8("pushButton_start"))
         self.pushButton_Ftest = QtGui.QPushButton(self.scrollAreaWidgetContents)
         self.pushButton_Ftest.setGeometry(QtCore.QRect(20, 190, 31, 31))
-        self.pushButton_Ftest.setStyleSheet(_fromUtf8("background-image: url(/media/tete/F/TinyOS/wsnA/F-test.png);"))
+        self.pushButton_Ftest.setStyleSheet(_fromUtf8("background-image: url(/media/tete/F/TinyOS/wsnA/resource/F-test.png);"))
         self.pushButton_Ftest.setText(_fromUtf8(""))
         self.pushButton_Ftest.setObjectName(_fromUtf8("pushButton_Ftest"))
         self.pushButton_Interpolation = QtGui.QPushButton(self.scrollAreaWidgetContents)
         self.pushButton_Interpolation.setGeometry(QtCore.QRect(20, 260, 31, 31))
-        self.pushButton_Interpolation.setStyleSheet(_fromUtf8("background-image: url(/media/tete/F/TinyOS/wsnA/Interpolation.png);"))
+        self.pushButton_Interpolation.setStyleSheet(_fromUtf8("background-image: url(/media/tete/F/TinyOS/wsnA/resource/Interpolation.png);"))
         self.pushButton_Interpolation.setText(_fromUtf8(""))
         self.pushButton_Interpolation.setObjectName(_fromUtf8("pushButton_Interpolation"))
         self.pushButton_about = QtGui.QPushButton(self.scrollAreaWidgetContents)
         self.pushButton_about.setGeometry(QtCore.QRect(20, 510, 31, 31))
-        self.pushButton_about.setStyleSheet(_fromUtf8("background-image: url(/media/tete/F/TinyOS/wsnA/about.png);"))
+        self.pushButton_about.setStyleSheet(_fromUtf8("background-image: url(/media/tete/F/TinyOS/wsnA/resource/about.png);"))
         self.pushButton_about.setText(_fromUtf8(""))
         self.pushButton_about.setObjectName(_fromUtf8("pushButton_about"))
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
@@ -101,10 +110,11 @@ class Ui_Dialog(QtGui.QWidget):
         #self.pushButton.setGeometry(QtCore.QRect(80, 0, 191, 21))
         #self.pushButton.setObjectName(_fromUtf8("pushButton"))
 
+        ''' The above codes was created by Qt designer. '''
 
 
         self.pushButton_about.clicked.connect(self._about)
-        self.pushButton_start.clicked.connect(self.plot)
+        self.pushButton_start.clicked.connect(self.create_node_obj)
         self.pushButton_addfile.clicked.connect(self.add_logcallsfile)
 
         # for matplotlib
@@ -117,7 +127,7 @@ class Ui_Dialog(QtGui.QWidget):
 
         # a figure instance to plot on
         self.figure = plt.figure()
-	
+
 
         # this is the Canvas Widget that displays the `figure`
         # it takes the `figure` instance as a parameter to __init__
@@ -129,15 +139,21 @@ class Ui_Dialog(QtGui.QWidget):
         self.verticalLayout_2.addWidget(self.toolbar)
         self.verticalLayout_2.addWidget(self.canvas)
 
+        ''' format: {logcalls file path: node object} '''
+        self.nodes = dict()
+        self.progress_bar_value = 0
+
+        
+        # store the path of logcalls file from simulation.
+        self.logcallsfile_path = dict()
 
 
+        ''' The below codes was created by Qt designer. '''
         self.retranslateUi(Dialog)
         self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
 
-        # store the path of logcalls file from simulation.
-        self.logcallsfile_path = dict()
 
 
     def add_logcallsfile(self):
@@ -147,12 +163,48 @@ class Ui_Dialog(QtGui.QWidget):
         if len(file_path) == 0:
             return
 
+        if file_path in self.logcallsfile_path.values():
+            print_log('warning', 'Already existed file path ')
+            return 
+
         self.logcallsfile_path[len(self.logcallsfile_path)+1] = file_path
-        
+
         self.textBro_logcalls.setText('[Notice]:\nmust be a file containing logcalls.\n')
         for e in self.logcallsfile_path.keys():
             self.textBro_logcalls.append('[' + str(e)  +'] ' + self.logcallsfile_path[e])
 
+        print_log('info', 'Add a new logcalls file where [' + file_path + ']')
+
+
+        
+
+    def create_node_obj(self):
+        progress_value = 0
+        self.progressBar.setValue(0)
+        for k in self.logcallsfile_path:
+            progress_value += 1
+            if self.logcallsfile_path[k] not in self.nodes:
+                self.nodes[k] = NodeLogcalls(self.logcallsfile_path[k])
+                self.progressBar.setValue(float(progress_value)/len(self.logcallsfile_path)*100)
+
+        self.called_func = list()
+        for k in self.nodes:
+            self.called_func += self.nodes[k].called_func
+
+        self.called_func = list(set(self.called_func))
+
+        tmp = dict()
+        def assign(v):
+            tmp[self.called_func.index(v)] = v
+        map(assign , self.called_func)
+        self.called_func = tmp
+        
+        self.textBro_func.setText('') # Clear it.
+        for e in self.called_func:
+            self.textBro_func.append('[' + str(e) + '] ' + self.called_func[e])
+
+
+        self.plot_all_logcalls()
 
 
 
@@ -182,6 +234,52 @@ class Ui_Dialog(QtGui.QWidget):
 
         return sub_two_interpolation_func
 
+
+    def plot_all_logcalls(self):
+
+        # instead of ax.hold(False)
+        self.figure.clear()
+
+        # create an axis
+        self.ax1 = self.figure.add_subplot(121)
+	# create an axis
+        self.ax2 = self.figure.add_subplot(122)
+
+        # discards the old graph
+        # ax.hold(False) # deprecated, see above
+
+        #sr_x = [i for i in range(-50, 51, 5)]
+        # processbar example:
+        
+        #sr_fx = [i*random.randint(0, 4) for i in sr_x]
+        any_node_logcalls = dict()
+        sr_x = list()
+        for e in self.called_func.keys():
+            for i in self.nodes:
+                (i not in sr_x) and sr_x.append(i)
+                if e not in any_node_logcalls:
+                    any_node_logcalls[e] = list()
+                any_node_logcalls[e].append(self.nodes[i].get_func_count(self.called_func[e]))
+
+
+        '''
+        Lx = self.get_sub_two_interpolation_func(sr_x, sr_fx)
+        self.tmp_x = [i for i in range(-50, 51)]
+        self.tmp_y = [Lx(i) for i in self.tmp_x]
+        '''
+        # plot data
+        #ax.plot(data, '*-')
+
+        for e in self.called_func:
+            sr_fx = any_node_logcalls[e]
+            self.ax1.plot(sr_x, sr_fx, linestyle = '--', marker='o', color='b')
+        #self.ax2.plot(self.tmp_x, self.tmp_y, linestyle = '--', color='r')
+
+        # refresh canvas
+        self.canvas.draw()
+
+
+    
     def plot(self):
         ''' plot some random stuff '''
         # random data
@@ -244,7 +342,7 @@ class AboutWindow(QtGui.QWidget):
         self.label.setObjectName(_fromUtf8("label"))
         self.widget = QtGui.QWidget(Form)
         self.widget.setGeometry(QtCore.QRect(90, 80, 64, 65))
-        self.widget.setStyleSheet(_fromUtf8("background-image: url(/media/tete/F/TinyOS/wsnA/logo.png);"))
+        self.widget.setStyleSheet(_fromUtf8("background-image: url(/media/tete/F/TinyOS/wsnA/resource/logo.png);"))
         self.widget.setObjectName(_fromUtf8("widget"))
         self.label_2 = QtGui.QLabel(Form)
         self.label_2.setGeometry(QtCore.QRect(110, 140, 181, 41))
