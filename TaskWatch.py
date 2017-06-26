@@ -171,7 +171,7 @@ def get_route_related_fun(nodes, func_name, time_gap, alpha=0.05):
     '''
     all_statistic = list()
     for e in nodes.values():
-        all_statistic.append(e.get_statistic_timewind(func_name, 1500))
+        all_statistic.append(e.get_statistic_timewind(func_name, time_gap))
     f, p = f_oneway(*all_statistic)
     # print f, p
     return True if p < alpha else False
