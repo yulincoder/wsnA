@@ -18,7 +18,6 @@ node = NodeLogcalls('logcalls path')
 
 2.获得所有被调用的函数
 ``` python
-from TaskWatch import NodeLogcalls
 node.get_calledfunc()
 ```
 
