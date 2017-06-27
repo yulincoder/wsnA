@@ -10,6 +10,8 @@ wsnA是一个[TinyOS](http://tinyos.stanford.edu/)应用程序运行模式分析
 
 logcalls文件来自于[Cooja](https://github.com/yulincoder/contiki)仿真环境.
 
+![demo](https://user-images.githubusercontent.com/10429180/27587259-47c22da4-5b76-11e7-8f1e-2b98475cf824.png)
+
 1.将logcalls文件导入
 ``` python
 from TaskWatch import NodeLogcalls
