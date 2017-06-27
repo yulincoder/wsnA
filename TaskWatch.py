@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 import gc
 import json
 from scipy.stats import f_oneway
-
+from scipy.stats import f as F
+import te_f_oneway
 
 class NodeLogcalls:
     ''' 参数为节点logcalls路径 '''
@@ -156,6 +157,32 @@ class NodeLogcalls:
                                                   self.pure_calls)))
 
 
+
+# That function use the te_f_oneway as ANOVA analysis written by Zhang Te a nice people.
+def get_route_related_fun(nodes, func_name, time_gap, alpha=0.05):
+    ''' param: nodes     所有节点数据
+        param: func_name 要判断的函数/任务名
+        param: time_gap  统计的时间窗口大小(ms), 该参数决定样本容量
+        param: alpha     显著水平
+
+        return: True     经过方差分析, 多组数据之间的差异具有统计学意义,
+                         即该函数的调用次数与组间因素(不同路由)的影响有关
+                False    反之
+
+        根据指定alpha返回某函数是否路由相关
+        该函数基于方差分析, 且没有进行方差齐检验
+    '''
+    all_statistic = list()
+    for e in nodes.values():
+        all_statistic.append(e.get_statistic_timewind(func_name, time_gap))
+    f = te_f_oneway.te_f_oneway(*all_statistic)
+
+    f_alpha = F.isf(alpha, len(all_statistic)-1, sum([len(e) for e in all_statistic])-len(all_statistic))
+
+    return True if f > f_alpha else False
+
+
+""" That function use the f_oneway as ANOVA analysis provided by scipy library.
 def get_route_related_fun(nodes, func_name, time_gap, alpha=0.05):
     ''' param: nodes     所有节点数据
         param: func_name 要判断的函数/任务名
@@ -175,7 +202,7 @@ def get_route_related_fun(nodes, func_name, time_gap, alpha=0.05):
     f, p = f_oneway(*all_statistic)
     # print f, p
     return True if p < alpha else False
-
+"""
 
 def get_axs(num=140):
     ''' 获得指定数量的子图, 子图数量总是4的倍数 31857
