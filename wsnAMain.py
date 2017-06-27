@@ -220,6 +220,7 @@ class Ui_Dialog(QtGui.QWidget):
         self.called_func = list()  # Reset it.
         progress_value = 0
         self.progressBar.setValue(0)
+
         for k in self.logcallsfile_path:
             progress_value += 1
             if self.logcallsfile_path[k] not in self.nodes:
@@ -255,15 +256,22 @@ class Ui_Dialog(QtGui.QWidget):
         # initializtion of it.
         self.called_func_route = list()
 
+        progress_value = 0
+        self.progressBar.setValue(0)
         for e in self.called_func.values():
             # 使用默认的显著水平, 即alpha = 5%, 时间窗口为1000ms
             if get_route_related_fun(self.nodes, e, 1000):
                 self.called_func_route.append(e)
 
+            progress_value += 1
+            self.progressBar.setValue(
+                float(progress_value) / len(self.called_func.values()) * 100)
+
         self.textBro_routed.setText('')  # Clear it.
         for e in self.called_func_route:
             reverse_dict = {v: k for k, v in self.called_func.items()}
             self.textBro_routed.append('[' + str(reverse_dict[e]) + '] ' + e)
+
         print_log('info', 'ANOVA was finished.')
         self.plot_all_logcalls()
 
@@ -343,6 +351,7 @@ class Ui_Dialog(QtGui.QWidget):
                 any_node_logcalls[e].append(self.nodes[i].get_func_count(e))
 
         progress_value = 0
+        self.progressBar.setValue(0)
         for e in self.called_func_route:
             sr_fx = any_node_logcalls[e]
             self.ax1.plot(sr_x, sr_fx, linestyle='', marker='o', color='b')
