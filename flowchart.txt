@@ -1,0 +1,18 @@
+%% wsnA基本工作mermaid流程图
+graph LR
+  start(开始) --导入文件--> parse(解析)
+  parse --> ANOVA(方差分析)
+  ANOVA --> visual(可视化)
+  ANOVA --> interpolation(插值)
+  interpolation --> visual
+
+  style start fill:#CDE498,stroke:#1A8D19,stroke-width:2px
+  style parse fill:#CDE498,stroke:#1A8D19,stroke-width:2px
+  style ANOVA fill:#CDE498,stroke:#1A8D19,stroke-width:2px
+  style interpolation fill:#CDE498,stroke:#1A8D19,stroke-width:2px
+  style visual fill:#CDE498,stroke:#1A8D19,stroke-width:2px
+  linkStyle 0 stroke:#1A8D19,stroke-width:3px
+  linkStyle 1 stroke:#1A8D19,stroke-width:2px
+  linkStyle 2 stroke:#1A8D19,stroke-width:2px
+  linkStyle 3 stroke:#1A8D19,stroke-width:2px
+  linkStyle 4 stroke:#1A8D19,stroke-width:2px
