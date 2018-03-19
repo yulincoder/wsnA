@@ -12,13 +12,13 @@ logcalls文件来自于[Cooja](https://github.com/yulincoder/contiki)仿真环�
 
 ![demo](https://user-images.githubusercontent.com/10429180/27587259-47c22da4-5b76-11e7-8f1e-2b98475cf824.png)
 
-1.将logcalls文件导入
+1. 将logcalls文件导入
 ``` python
 from TaskWatch import NodeLogcalls
 node = NodeLogcalls('logcalls path')
 ```
 
-2.获得所有被调用的函数
+2. 获得所有被调用的函数
 ``` python
 node.get_calledfunc()
 ```
